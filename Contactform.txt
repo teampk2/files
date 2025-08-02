@@ -1,0 +1,174 @@
+I can guide you through the process of setting it up on your local machine so you can see a live preview there.
+
+Here's a step-by-step guide to help you implement the contact form and see a live preview:
+
+### Step 1: Set Up Your Project
+
+1. **Create a Project Directory**: Create a new directory for your project and navigate into it.
+
+```bash
+mkdir contact-form
+cd contact-form
+```
+
+2. **Initialize a Node.js Project**: Initialize a new Node.js project.
+
+```bash
+npm init -y
+```
+
+3. **Install Required Packages**: Install Express, body-parser, and nodemailer.
+
+```bash
+npm install express body-parser nodemailer
+```
+
+### Step 2: Create the Backend Server
+
+Create a file named `server.js` and add the following code:
+
+```javascript
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'your-email@gmail.com', // Replace with your Gmail address
+    pass: 'your-password' // Replace with your Gmail password or app-specific password
+  }
+});
+
+app.post('/send-email', (req, res) => {
+  const { name, email, message } = req.body;
+
+  const mailOptions = {
+    from: 'your-email@gmail.com',
+    to: 'xtralive99@gmail.com',
+    subject: `New message from ${name}`,
+    text: `You have a new message from ${name} (${email}): ${message}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.status(500).send(error.toString());
+    }
+    res.status(200).send('Email sent: ' + info.response);
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
+```
+
+### Step 3: Create the Frontend Form
+
+Create a directory named `public` and inside it, create a file named `index.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contact Us</h1>
+    <form id="contactForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            const response = await fetch('/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, message }),
+            });
+
+            if (response.ok) {
+                alert('Message sent successfully');
+            } else {
+                alert('Failed to send message');
+            }
+        });
+    </script>
+</body>
+</html>
+```
+
+### Step 4: Run Your Server
+
+Start your server by running:
+
+```bash
+node server.js
+```
+
+### Step 5: Test Your Contact Form
+
+Open your web browser and navigate to `http://localhost:3000`. Fill out the form and submit it. If everything is set up correctly, you should receive an email at `xtralive99@gmail.com`.
+
